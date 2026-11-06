@@ -1,0 +1,5 @@
+geopandas
+psycopg2
+requests
+python-dotenv
+rich

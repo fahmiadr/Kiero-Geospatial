@@ -1,0 +1,166 @@
+Daftar Prameter frontend:
+	view_mode (system, tidak untuk diedit)
+	active_pin_id (system, tidak untuk diedit)
+	provinsi (editable)
+	kabkota (editable)
+	kecamatan (editable)
+	desakel (editable)
+	category (editable)
+	startDate (editable)
+	endDate (editable)
+	zoom (editable)
+	share_lat (editable)
+	share_lng (editable)
+	share_title (editable)
+
+http://localhost:5173/mendawai-geospatial/?startDate=2025-06-01&endDate=2025-06-01&category=8a&view_mode=region-only&provinsi=DKI+Jakarta&kabkota=Kota+Adm.+Jakarta+Pusat&kecamatan=Senen&desakel=Kramat
+Penggunan:
+1. provinsi && kabkota && kecamatan && desakel
+	( http://localhost:5173/mendawai-geospatial/?provinsi=DKI+Jakarta&kabkota=Kota+Adm.+Jakarta+Pusat&kecamatan=Senen&desakel=Kramat )
+	- provinsi = untuk menampilkan wilayah provinsi (berdasarkan data kolom nama pada regions)
+		contoh: "DKI Jakarta" ditulis "DKI+Jakarta" (spasi diganti tanda '+')
+	- kabkota = untuk menampilkan wilayah kab/kota (berdasarkan data kolom nama di regions)
+		contoh: "Kota Adm. Jakarta Pusat" ditulis "Kota+Adm.+Jakarta+Pusat" (spasi diganti tanda '+')
+	- kecamatan = untuk menampilkan wilayah kecamatan (berdasarkan data kolom nama di regions)
+		contoh: "Senen" ditulis "Senen"
+	- desakel = untuk menampilkan wilayah desa/kelurahan (berdasarkan data kolom nama di regions)
+		contoh: "Kramat" ditulis "Kramat"
+	catatan: Parameter di atas harus hirarkis artinya kabkota tidak boleh tanpa provinsi, kecamatan tidak boleh tanpa kabkota, dst.
+
+2. category
+	( http://localhost:5173/mendawai-geospatial/?category=8a )
+	- category = untuk memfilter ticket berdasarkan category category_id (berdasarkan nilai category_id pada category_systemcode)
+		contoh: "1a", "1b", "1c", "1d", dst
+
+3. startDate && endDate
+	( http://localhost:5173/mendawai-geospatial/?category=8a&startDate=2025-06-01&endDate=2025-06-05)
+	- startDate (yyyy-mm-dd) = untuk rentang mulai
+		contoh: "2025-06-01"
+	- endDate (yyyy-mm-dd) = untuk rentang akhir
+		contoh: "2025-06-05"
+	catatan: startDate dan endDate bekerja bersama (tidak bisa ada salah-satunya saja)
+	untuk satu hari maka startDate dan endDate bernilai sama, misal: "startDate=2025-11-19&endDate=2025-11-19"
+
+4. zoom = untuk mengoveride zoom bawaan aplikasi (nilai yang direkomendasikan 12-17)
+
+5. share_lat, share_lng, share_title = untuk membuat pin yang dibagikan,
+contoh: 
+	share_lat=-6.662787435333991&share_lng=111.46868102396945&share_title=Point+of+Interest
+
+
+parent ke iframe (action)
+- action: init (untuk memulai iframe)
+- action: searchPrefix (payload.phoneNumber)
+
+message (pesan dari iframe ke parent) source:'mapIframeApp'
+- type: 'iframeReady'
+- type: 'initialized'
+- type: 'pinCreated'
+- type: 'regionDataLoaded'
+- type: 'pinSelected'`
+- tyoe: 'error'
+
+
+Parent ke Iframe (Actions)
+
+A. Inisialisasi (init)
+Wajib dikirimkan setelah Parent menerima sinyal iframeReady dari iframe. Pesan ini memberitahu Iframe bahwa Parent siap dan otentikasi (jika ada) dianggap berhasil.
+	Action: 'init'
+	Payload: null (Tidak diperlukan)
+
+	Contoh:
+	mapIframe.contentWindow.postMessage({
+	    action: 'init'
+	}, '*');
+
+B. Pencarian Prefix (searchPrefix)
+Digunakan untuk memerintahkan peta mencari wilayah berdasarkan nomor telepon (MSISDN).
+	Action: 'searchPrefix'
+	Payload:
+	phoneNumber (String): Nomor telepon yang akan dicari prefix-nya.
+
+	Contoh:
+	mapIframe.contentWindow.postMessage({
+    		action: 'searchPrefix',
+    		payload: {
+	        phoneNumber: '211234567'// tanpa (0) 211234567
+	    	}
+	}, '*');
+
+
+Iframe ke Parent (Events)
+
+A. Iframe Siap (iframeReady)
+	Dikirim segera setelah komponen React di dalam iframe selesai dimuat (mounted).
+	Tujuan: Memberi tahu Parent bahwa iframe sudah aktif dan siap menerima perintah init.
+	Struktur Data:
+	{
+  	"source": "mapIframeApp",
+  	"type": "iframeReady"
+	}
+
+B. Terinisialisasi (initialized)
+	Dikirim sebagai balasan setelah iframe berhasil memproses action init. UI Iframe akan terbuka (tidak disabled lagi).
+	Tujuan: Konfirmasi handshake sukses.
+	Struktur Data:
+	{
+	  "source": "mapIframeApp",
+	  "type": "initialized"
+	}
+
+C. Data Wilayah Dimuat (regionDataLoaded)
+	Dikirim setelah action searchPrefix berhasil dijalankan dan data wilayah ditemukan.
+	Tujuan: Memberikan data cakupan wilayah kepada Parent tanpa Parent harus memproses GeoJSON sendiri.
+	Struktur Data:
+	{
+	  "source": "mapIframeApp",
+	  "type": "regionDataLoaded",
+	  "payload": {
+	    "matchedPrefix": "21", // Prefix yang cocok
+	    "regions": [...]          // Array data wilayah yang relevan
+	  }
+	}
+
+D. Pin Dibuat (pinCreated)
+	Dikirim ketika pengguna menjatuhkan pin baru (Point of Interest) di peta dan data administrasi wilayahnya selesai dimuat.
+	Tujuan: Menyimpan data lokasi baru yang dibuat user.
+	Struktur Data:
+	{
+	  "source": "mapIframeApp",
+	  "type": "pinCreated",
+	  "payload": {
+	    "id": "uuid-string",
+	    "lat": -6.200000,
+	    "lng": 106.816666,
+	    "title": "Point of Interest",
+	    "adminInfo": { ... } // Data Provinsi, Kota, Kec, Desa
+	  }	
+	}
+
+E. Pin Dipilih (pinSelected)
+	Dikirim ketika pengguna mengklik tombol "Pilih" pada InfoWindow sebuah pin yang sudah ada.
+	Tujuan: Mengambil data lokasi yang dipilih user untuk digunakan di form Parent.
+	Struktur Data:
+	{
+	  "source": "mapIframeApp",
+	  "type": "pinSelected",
+	  "payload": {
+	    "id": "uuid-string",
+	    "lat": -6.200000,
+	    "lng": 106.816666,
+	    "title": "Judul Pin",
+	    "adminInfo": { ... }
+	  }
+	}
+
+F. Error (error)
+	Dikirim jika terjadi kesalahan proses di dalam iframe (misalnya gagal fetch API prefix).
+	Tujuan: Logging atau notifikasi error di sisi Parent.
+	Struktur Data:
+	{
+	  "source": "mapIframeApp",
+	  "type": "error",
+	  "payload": {
+	    "message": "Deskripsi error yang terjadi"
+	  }
+	}

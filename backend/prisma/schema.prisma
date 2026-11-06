@@ -1,0 +1,832 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model aux_history {
+  id       BigInt    @id @default(autoincrement())
+  username String?   @db.VarChar(50)
+  aux_id   Int?
+  aux_name String?   @db.VarChar(100)
+  aux_date DateTime? @db.Timestamptz(6)
+}
+
+model aux_status {
+  id          Int       @id @default(autoincrement())
+  aux_name    String?   @db.VarChar(100)
+  created_at  DateTime? @db.Timestamptz(6)
+  created_by  String?   @db.VarChar(50)
+  description String?
+  is_active   Boolean   @default(true)
+}
+
+model call_detail_records {
+  id                  BigInt  @id @default(autoincrement())
+  session_id          String? @db.VarChar(150)
+  call_id             String? @db.VarChar(150)
+  callee              String? @db.VarChar(50)
+  callee_domain       String? @db.VarChar(150)
+  caller              String? @db.VarChar(50)
+  caller_display_name String? @db.VarChar(150)
+  caller_domain       String? @db.VarChar(150)
+  ring_time           Int?
+  answered_time       Int?
+  start_time          Int?
+  ended_time          Int?
+  ended_reason        String? @db.VarChar(150)
+  event_type          String? @db.VarChar(50)
+  direction           String? @db.VarChar(50)
+  status_code         String? @db.VarChar(50)
+  tenant_id           String? @db.VarChar(50)
+  tenant_name         String? @db.VarChar(50)
+}
+
+model call_history {
+  id             BigInt    @id @default(autoincrement())
+  interaction_id String?   @db.VarChar(50)
+  ticket_number  String?   @db.VarChar(50)
+  agent_handle   String?   @db.VarChar(50)
+  customer_id    String?   @db.VarChar(50)
+  phone_number   String?   @db.VarChar(50)
+  call_type      String?   @db.VarChar(20)
+  datetime_start DateTime? @db.Timestamptz(6)
+  datetime_end   DateTime? @db.Timestamptz(6)
+}
+
+model categories {
+  id            BigInt    @id @default(autoincrement())
+  category_id   String    @db.VarChar(20)
+  description   String?   @db.VarChar(255)
+  created_at    DateTime? @db.Timestamptz(6)
+  updated_at    DateTime? @db.Timestamptz(6)
+  created_by    String?   @db.VarChar(50)
+  updated_by    String?   @db.VarChar(50)
+  category_name String    @db.VarChar(150)
+  is_active     Boolean   @default(true)
+  sort_order    Int       @default(0)
+  tickets       tickets[]
+}
+
+model category_sub {
+  id                BigInt    @id @default(autoincrement())
+  category_sub_id   String    @db.VarChar(20)
+  category_sub_name String    @db.VarChar(250)
+  description       String?   @db.VarChar(250)
+  created_at        DateTime? @db.Timestamptz(6)
+  updated_at        DateTime? @db.Timestamptz(6)
+  created_by        String?   @db.VarChar(50)
+  updated_by        String?   @db.VarChar(50)
+  sort_order        Int       @default(0)
+  is_active         Boolean   @default(true)
+  category_id       BigInt?
+  tickets           tickets[]
+}
+
+model channels {
+  id           BigInt    @id @default(autoincrement())
+  channel_type String?   @db.VarChar(100)
+  description  String?
+  created_by   String?   @db.VarChar(50)
+  updated_by   String?   @db.VarChar(50)
+  created_at   DateTime? @db.Timestamptz(6)
+  updated_at   DateTime? @db.Timestamptz(6)
+  is_active    Boolean   @default(true)
+  channel_name String?   @db.VarChar(50)
+  sort_order   Int?
+}
+
+model customer_channels {
+  customer_id    String?   @db.VarChar(50)
+  value_channel  String?   @db.VarChar(255)
+  origin_id      String?   @db.VarChar(50)
+  detail_channel String?   @db.VarChar(150)
+  created_at     DateTime? @db.Timestamptz(6)
+  updated_at     DateTime? @db.Timestamptz(6)
+  created_by     String?   @db.VarChar(100)
+  sync_to        String?   @db.VarChar(50)
+  type_channel   String?   @db.VarChar(50)
+  updated_by     String?   @db.VarChar(100)
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  @@index([customer_id, type_channel, value_channel, origin_id, sync_to])
+}
+
+model customer_type {
+  id          Int       @id @default(autoincrement()) @db.SmallInt
+  type_name   String?   @db.VarChar(50)
+  description String?
+  active      Int?      @db.SmallInt
+  created_by  String?   @db.VarChar(50)
+  updated_by  String?   @db.VarChar(50)
+  created_at  DateTime? @db.Timestamptz(6)
+  updated_at  DateTime? @db.Timestamptz(6)
+}
+
+model customers {
+  customer_id   String    @unique @db.VarChar(50)
+  customer_type String?   @db.VarChar(20)
+  city          String?   @db.VarChar(50)
+  province      String?   @db.VarChar(50)
+  zip_code      String?   @db.VarChar(10)
+  address       String?
+  birth_date    DateTime? @db.Date
+  gender        String?   @db.VarChar(50)
+  phone_number  String?   @db.VarChar(50)
+  mobile_number String?   @db.VarChar(50)
+  other_number  String?   @db.VarChar(50)
+  email         String?   @db.VarChar(50)
+  account_id    String?   @db.VarChar(50)
+  status        Int?      @db.SmallInt
+  remark        String?
+  sync_date     DateTime? @db.Timestamptz(6)
+  source        String?   @db.VarChar(100)
+  created_at    DateTime? @db.Timestamptz(6)
+  updated_at    DateTime? @db.Timestamptz(6)
+  created_by    String?   @db.VarChar(50)
+  updated_by    String?   @db.VarChar(50)
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customer_name String    @db.VarChar(150)
+  district      String?   @db.VarChar(50)
+  village       String?   @db.VarChar(50)
+  is_active     Boolean?
+  blacklist     Boolean?
+  sync_to       String?   @db.VarChar(50)
+  lat           Decimal?  @db.Decimal(11, 9)
+  lng           Decimal?  @db.Decimal(12, 9)
+  tickets       tickets[]
+
+  @@index([created_at])
+  @@index([phone_number, mobile_number, other_number, email, account_id])
+}
+
+model email_accounts {
+  id         Int       @id @default(autoincrement())
+  username   String?   @db.VarChar(255)
+  password   String?   @db.VarChar(255)
+  host       String?   @db.VarChar(255)
+  port       Int?
+  type       String?   @db.VarChar(50)
+  created_at DateTime? @db.Timestamptz(6)
+  updated_at DateTime? @db.Timestamptz(6)
+  tls        Boolean?
+  active     Boolean?
+
+  @@index([username])
+}
+
+model email_attachments {
+  id         BigInt    @id @default(autoincrement())
+  email_id   String?   @db.VarChar(50)
+  encode     String?
+  filename   String?
+  filetype   String?   @db.VarChar(100)
+  direction  String?   @db.VarChar(50)
+  created_at DateTime? @db.Timestamptz(6)
+  created_by String?   @db.VarChar(50)
+  filepath   String?
+
+  @@index([email_id])
+}
+
+model email_inbound {
+  id             BigInt    @id @default(autoincrement())
+  email_id       String    @db.VarChar(50)
+  interaction_id String?   @db.VarChar(50)
+  ename          String?   @db.VarChar(150)
+  efrom          String?
+  eto            String?
+  ecc            String?
+  ebcc           String?
+  esubject       String?
+  ebody_text     String?
+  ebody_html     String?
+  agent_handle   String?   @db.VarChar(50)
+  customer_id    String?   @db.VarChar(50)
+  ticket_number  String?   @db.VarChar(50)
+  direction      String?   @db.VarChar(10)
+  status         String?   @db.VarChar(50)
+  account_email  String?   @db.VarChar(150)
+  date_email     DateTime? @db.Timestamptz(6)
+  date_receive   DateTime? @db.Timestamptz(6)
+  date_replied   DateTime? @db.Timestamptz(6)
+  date_assign    DateTime? @db.Timestamptz(6)
+
+  @@index([date_email])
+  @@index([email_id])
+  @@index([interaction_id])
+  @@index([ticket_number])
+}
+
+model email_notification {
+  id             BigInt    @id @default(autoincrement())
+  email_id       String    @db.VarChar(100)
+  interaction_id String?   @db.VarChar(50)
+  ename          String?   @db.VarChar(150)
+  eto            String?
+  efrom          String?
+  ecc            String?
+  ebcc           String?
+  esubject       String?
+  ebody_html     String?
+  date_email     DateTime? @db.Timestamptz(6)
+  date_sent      DateTime? @db.Timestamptz(6)
+  ticket_number  String?   @db.VarChar(50)
+  direction      String?   @db.VarChar(5)
+  status         String?   @db.VarChar(50)
+  agent_handle   String?   @db.VarChar(50)
+  sent           Int?      @db.SmallInt
+  sent_message   String?
+  sent_cnt       Int?      @db.SmallInt
+}
+
+model email_outbound {
+  id             BigInt    @id @default(autoincrement())
+  email_id       String    @db.VarChar(100)
+  interaction_id String?   @db.VarChar(50)
+  ename          String?   @db.VarChar(150)
+  eto            String?
+  efrom          String?
+  ecc            String?
+  ebcc           String?
+  esubject       String?
+  ebody_html     String?
+  date_email     DateTime? @db.Timestamptz(6)
+  date_sent      DateTime? @db.Timestamptz(6)
+  ticket_number  String?   @db.VarChar(50)
+  direction      String?   @db.VarChar(5)
+  agent_handle   String?   @db.VarChar(50)
+  sent_message   String?
+  email_type     String?   @db.VarChar(50)
+  sent_status    Boolean?
+  sent_cnt       Int?      @db.SmallInt
+
+  @@index([date_email])
+  @@index([email_id])
+  @@index([interaction_id])
+  @@index([ticket_number])
+}
+
+model email_templates {
+  id           Int       @id @default(autoincrement())
+  created_by   String?   @db.VarChar(50)
+  updated_by   String?   @db.VarChar(50)
+  created_at   DateTime? @db.Timestamptz(6)
+  updated_at   DateTime? @db.Timestamptz(6)
+  content_body String?
+  title        String?   @db.VarChar(100)
+}
+
+model feeds {
+  id            BigInt    @id @default(autoincrement())
+  post_id       String?   @db.VarChar(50)
+  page_id       String?   @db.VarChar(50)
+  page_name     String?   @db.VarChar(150)
+  channel       String?   @db.VarChar(100)
+  caption       String?
+  created_at    DateTime? @db.Timestamptz(6)
+  permalink_url String?   @db.VarChar(255)
+  media_url     String?
+  media_type    String?   @db.VarChar(20)
+}
+
+model feeds_attachments {
+  id          BigInt    @id @default(autoincrement())
+  post_id     BigInt?
+  page_id     BigInt?
+  page_name   String?   @db.VarChar(150)
+  channel     String?   @db.VarChar(100)
+  file_name   String?   @db.VarChar(255)
+  file_type   String?   @db.VarChar(50)
+  file_path   String?
+  date_create DateTime? @db.Timestamptz(6)
+}
+
+model feeds_interactions {
+  id              BigInt    @id @default(autoincrement())
+  chat_id         String    @db.VarChar(50)
+  user_id         String?   @db.VarChar(255)
+  customer_id     String    @db.VarChar(50)
+  name            String?   @db.VarChar(100)
+  email           String?   @db.VarChar(100)
+  flag_to         String?   @db.VarChar(50)
+  message         String?
+  message_type    String?   @db.VarChar(50)
+  date_create     DateTime? @db.Timestamptz(6)
+  status_chat     String?   @db.VarChar(50)
+  agent_handle    String?   @db.VarChar(50)
+  date_assign     DateTime? @db.Timestamptz(6)
+  channel         String?   @db.VarChar(50)
+  message_id      String?   @db.VarChar(250)
+  ticket_number   String?   @db.VarChar(50)
+  page_id         String?   @db.VarChar(50)
+  post_id         String?   @db.VarChar(100)
+  comment_id      String?   @db.VarChar(100)
+  reply_id        String?   @db.VarChar(100)
+  flag_end        String?   @db.VarChar(1)
+  flag_notif      Int?      @db.SmallInt
+  flag_sent       Int?      @db.SmallInt
+  cnt             Int?      @db.SmallInt
+  sentiment       String?   @db.VarChar(50)
+  objective_score String?   @db.VarChar(20)
+  positive_score  String?   @db.VarChar(20)
+  negative_score  String?   @db.VarChar(20)
+}
+
+model knowledge_base {
+  filename        String?   @db.VarChar(250)
+  filetype        String?   @db.VarChar(50)
+  filesize        String?   @db.VarChar(20)
+  fileurl         String?
+  filepath        String?
+  created_at      DateTime? @db.Timestamptz(6)
+  updated_at      DateTime? @db.Timestamptz(6)
+  knowledge_name  String    @db.VarChar(250)
+  description     String?
+  category        String?   @db.VarChar(50)
+  source          String?   @db.VarChar(50)
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  answer_detail   String?
+  question_detail String?
+  ticket_number   String?   @db.VarChar(50)
+
+  @@index([category])
+  @@index([filename])
+  @@index([knowledge_name])
+  @@index([source])
+}
+
+model mentions {
+  id              BigInt    @id @default(autoincrement())
+  chat_id         String    @db.VarChar(50)
+  user_id         String?   @db.VarChar(255)
+  customer_id     String    @db.VarChar(50)
+  name            String?   @db.VarChar(100)
+  email           String?   @db.VarChar(100)
+  flag_to         String?   @db.VarChar(50)
+  message         String?
+  message_type    String?   @db.VarChar(50)
+  date_create     DateTime? @db.Timestamptz(6)
+  status_chat     String?   @db.VarChar(50)
+  flag_end        String?   @db.VarChar(1)
+  agent_handle    String?   @db.VarChar(50)
+  date_assign     DateTime? @db.Timestamptz(6)
+  channel         String?   @db.VarChar(50)
+  message_id      String?   @db.VarChar(50)
+  ticket_number   String?   @db.VarChar(50)
+  page_id         String?   @db.VarChar(50)
+  post_id         String?   @db.VarChar(100)
+  comment_id      String?   @db.VarChar(100)
+  reply_id        String?   @db.VarChar(100)
+  flag_notif      String?   @db.VarChar(1)
+  cnt             String?   @db.VarChar(1)
+  sentiment       String?   @db.VarChar(50)
+  objective_score String?   @db.VarChar(20)
+  positive_score  String?   @db.VarChar(20)
+  negative_score  String?   @db.VarChar(20)
+}
+
+model menu {
+  menu_id   BigInt  @id @default(autoincrement())
+  menu_name String? @db.VarChar(100)
+  number    Int?
+  path      String? @db.VarChar(100)
+  icon      String? @db.VarChar(100)
+  is_root   Int?    @db.SmallInt
+}
+
+model messages_attachments {
+  id          BigInt    @id @default(autoincrement())
+  message_id  String?   @db.VarChar(100)
+  chat_id     String    @db.VarChar(50)
+  file_origin String?
+  file_name   String?
+  file_type   String?   @db.VarChar(100)
+  file_size   String?   @db.VarChar(100)
+  file_url    String?
+  user_create String?   @db.VarChar(100)
+  created_at  DateTime? @db.Timestamptz(6)
+}
+
+model messages_closed {
+  chat_id         String    @db.VarChar(50)
+  user_id         String?   @db.VarChar(255)
+  customer_id     String    @db.VarChar(50)
+  name            String?   @db.VarChar(100)
+  email           String?   @db.VarChar(100)
+  flag_to         String?   @db.VarChar(50)
+  message         String?
+  message_type    String?   @db.VarChar(50)
+  date_create     DateTime? @db.Timestamptz(6)
+  status_chat     String?   @db.VarChar(50)
+  flag_end        String?   @db.VarChar(1)
+  agent_handle    String?   @db.VarChar(50)
+  date_assign     DateTime? @db.Timestamptz(6)
+  channel         String?   @db.VarChar(50)
+  message_id      String?   @db.VarChar(250)
+  ticket_number   String?   @db.VarChar(50)
+  page_id         String?   @db.VarChar(50)
+  post_id         String?   @db.VarChar(100)
+  comment_id      String?   @db.VarChar(100)
+  reply_id        String?   @db.VarChar(100)
+  flag_notif      String?   @db.VarChar(1)
+  cnt             String?   @db.VarChar(1)
+  sentiment       String?   @db.VarChar(50)
+  objective_score String?   @db.VarChar(20)
+  positive_score  String?   @db.VarChar(20)
+  negative_score  String?   @db.VarChar(20)
+  flag_sent       Int?      @db.SmallInt
+  transfer_agent  String?   @db.VarChar(50)
+  start_time      DateTime? @db.Timestamptz(6)
+  end_time        DateTime? @db.Timestamptz(6)
+  id              String    @id @db.Uuid
+}
+
+model messages_interactions {
+  chat_id         String    @db.VarChar(50)
+  user_id         String?   @db.VarChar(255)
+  customer_id     String    @db.VarChar(50)
+  name            String?   @db.VarChar(100)
+  email           String?   @db.VarChar(100)
+  flag_to         String?   @db.VarChar(50)
+  message         String?
+  message_type    String?   @db.VarChar(50)
+  date_create     DateTime? @db.Timestamptz(6)
+  status_chat     String?   @db.VarChar(50)
+  flag_end        String?   @db.VarChar(1)
+  agent_handle    String?   @db.VarChar(50)
+  date_assign     DateTime? @db.Timestamptz(6)
+  channel         String?   @db.VarChar(50)
+  message_id      String?   @db.VarChar(250)
+  ticket_number   String?   @db.VarChar(50)
+  page_id         String?   @db.VarChar(50)
+  post_id         String?   @db.VarChar(100)
+  comment_id      String?   @db.VarChar(100)
+  reply_id        String?   @db.VarChar(100)
+  flag_notif      String?   @db.VarChar(1)
+  cnt             String?   @db.VarChar(1)
+  sentiment       String?   @db.VarChar(50)
+  objective_score String?   @db.VarChar(20)
+  positive_score  String?   @db.VarChar(20)
+  negative_score  String?   @db.VarChar(20)
+  flag_sent       Int?      @db.SmallInt
+  transfer_agent  String?   @db.VarChar(50)
+  start_time      DateTime? @db.Timestamptz(6)
+  end_time        DateTime? @db.Timestamptz(6)
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+}
+
+model messages_templates {
+  id              Int       @id @default(autoincrement())
+  short_code      String?   @db.VarChar(50)
+  content_message String?
+  created_by      String?   @db.VarChar(50)
+  updated_by      String?   @db.VarChar(50)
+  created_at      DateTime? @db.Timestamptz(6)
+  updated_at      DateTime? @db.Timestamptz(6)
+}
+
+model pbx_accounts {
+  id               Int     @id @default(autoincrement())
+  domain           String? @db.VarChar(255)
+  api_url          String? @db.VarChar(255)
+  extension_number BigInt?
+  password         String? @db.VarChar(50)
+  active           Int?    @db.SmallInt
+}
+
+model pbx_extensions {
+  id               Int       @id @default(autoincrement())
+  extension_id     String?   @db.VarChar(20)
+  extension_number BigInt?
+  extension_type   String?   @db.VarChar(10)
+  display_name     String?   @db.VarChar(50)
+  datetime         DateTime? @db.Timestamptz(6)
+  status           String?   @db.VarChar(50)
+  active           Int?      @db.SmallInt
+}
+
+model phone_prefix_regions {
+  phone_prefix_id BigInt
+  region_id       Int
+  phone_prefixes  phone_prefixes @relation(fields: [phone_prefix_id], references: [id])
+  regions         regions        @relation(fields: [region_id], references: [id])
+
+  @@id([phone_prefix_id, region_id])
+}
+
+model phone_prefixes {
+  id                   BigInt                 @id @default(autoincrement())
+  prefix               String                 @unique @db.VarChar(50)
+  description          String?
+  parent_id            BigInt?
+  phone_prefix_regions phone_prefix_regions[]
+  phone_prefixes       phone_prefixes?        @relation("phone_prefixesTophone_prefixes", fields: [parent_id], references: [id])
+  other_phone_prefixes phone_prefixes[]       @relation("phone_prefixesTophone_prefixes")
+
+  @@index([prefix])
+}
+
+model priorities {
+  id          Int       @id @default(autoincrement())
+  priority    String?   @db.VarChar(50)
+  description String?
+  created_by  String?   @db.VarChar(50)
+  updated_by  String?   @db.VarChar(50)
+  created_at  DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime? @db.Timestamptz(6)
+  is_active   Boolean   @default(true)
+  sla         Int?      @db.SmallInt
+}
+
+model regions {
+  id                   Int                     @id @default(autoincrement())
+  level                String?                 @db.VarChar(10)
+  tipe_adm             String?                 @db.VarChar(3)
+  nama                 String?                 @db.VarChar(50)
+  kode_prov            String?                 @db.VarChar(3)
+  kode_kab             String?                 @db.VarChar(11)
+  kode_kec             String?                 @db.VarChar(11)
+  luas                 Float?
+  geom                 Unsupported("geometry")
+  phone_prefix_regions phone_prefix_regions[]
+  tickets              tickets[]
+
+  @@index([geom], map: "idx_geom", type: Gist)
+  @@index([level, kode_prov, kode_kab, kode_kec], map: "idx_hirarki")
+  @@index([kode_kec, nama], map: "idx_kec_nama")
+  @@index([kode_kab], map: "idx_kode_kab_ops")
+  @@index([kode_kec], map: "idx_kode_kec_ops")
+  @@index([kode_prov], map: "idx_kode_prov_ops")
+  @@index([nama(ops: raw("gin_trgm_ops"))], map: "idx_nama_trgm", type: Gin)
+}
+
+model socmed_accounts {
+  id            Int       @id @default(autoincrement())
+  page_id       String?   @db.VarChar(50)
+  page_name     String?   @db.VarChar(150)
+  page_category String?   @db.VarChar(150)
+  channel       String?   @db.VarChar(100)
+  account_id    String?   @db.VarChar(50)
+  url_api       String?   @db.VarChar(255)
+  token         String?
+  token_secret  String?
+  user_secret   String?
+  active        Int?      @db.SmallInt
+  created_at    DateTime? @db.Timestamptz(6)
+  updated_at    DateTime? @db.Timestamptz(6)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model spatial_ref_sys {
+  srid      Int     @id
+  auth_name String? @db.VarChar(256)
+  auth_srid Int?
+  srtext    String? @db.VarChar(2048)
+  proj4text String? @db.VarChar(2048)
+}
+
+model teams {
+  id                                    Int       @id @default(autoincrement())
+  team_id                               String?   @db.VarChar(20)
+  team_name                             String    @db.VarChar(50)
+  description                           String?   @db.VarChar(255)
+  created_at                            DateTime? @db.Timestamptz(6)
+  updated_at                            DateTime? @db.Timestamptz(6)
+  created_by                            String?   @db.VarChar(50)
+  updated_by                            String?   @db.VarChar(50)
+  active                                Boolean   @default(true)
+  tickets_tickets_assign_to_teamToteams tickets[] @relation("tickets_assign_to_teamToteams")
+  tickets_tickets_team_idToteams        tickets[] @relation("tickets_team_idToteams")
+  users                                 users[]
+}
+
+model tenants {
+  id            Int     @id @default(autoincrement())
+  tenant_id     String? @db.VarChar(20)
+  tenant_name   String? @db.VarChar(150)
+  phone_number  String? @db.VarChar(50)
+  contact_email String? @db.VarChar(150)
+  location      String? @db.VarChar(250)
+  users         users[]
+}
+
+model ticket_attachments {
+  id            BigInt    @id @default(autoincrement())
+  customer_id   BigInt?
+  ticket_number String    @db.VarChar(20)
+  description   String?
+  created_by    String?   @db.VarChar(50)
+  created_at    DateTime? @db.Timestamptz(6)
+  filename      String?
+  filesize      String?   @db.VarChar(20)
+  filetype      String?   @db.VarChar(100)
+  fileurl       String?
+
+  @@index([ticket_number], map: "idx_ticket_attachments_ticket_number")
+}
+
+model ticket_closed {
+  customer_id        String    @db.VarChar(50)
+  ticket_number      String    @unique @db.VarChar(50)
+  status             String    @db.VarChar(50)
+  customer_id_merge  String?   @db.VarChar(50)
+  customer_id_origin String?   @db.VarChar(50)
+  complaint_detail   String?
+  response_detail    String?
+  sla                Int?
+  remark             String?
+  thread_id          String?   @db.VarChar(50)
+  account_id         String?   @db.VarChar(150)
+  account_name       String?   @db.VarChar(100)
+  last_response_by   String?   @db.VarChar(50)
+  last_response_at   DateTime? @db.Timestamptz(6)
+  channel_source     String    @db.VarChar(50)
+  channel_type       String?   @db.VarChar(50)
+  closed_at          DateTime? @db.Timestamptz(6)
+  closed_by          String?   @db.VarChar(50)
+  created_at         DateTime? @db.Timestamptz(6)
+  created_by         String?   @db.VarChar(50)
+  reference_id       String?   @db.VarChar(50)
+  team_id            Int?
+  notif_email        Boolean?
+  id                 String    @id @db.Uuid
+  priority           String?   @db.VarChar(20)
+  assign_to_team     Int?
+  assign_to_user     String?   @db.VarChar(50)
+  category_id        BigInt?
+  category_sub_id    BigInt?
+
+  @@index([customer_id])
+}
+
+model ticket_interactions {
+  id                 BigInt    @id @default(autoincrement())
+  ticket_number      String    @db.VarChar(50)
+  thread_id          String?   @db.VarChar(50)
+  response_complaint String?
+  status             String?   @db.VarChar(50)
+  channel            String?   @db.VarChar(50)
+  created_at         DateTime? @db.Timestamptz(6)
+  dispatch_ticket    String?   @db.VarChar(5)
+  dispatch_to_user   String?   @db.VarChar(10)
+  interaction_type   String?   @db.VarChar(50)
+  created_by         String?   @db.VarChar(100)
+  dispatch_to_team   String?   @db.VarChar(10)
+  channel_source     String?   @db.VarChar(50)
+  channel_type       String?   @db.VarChar(50)
+  complaint_detail   String?
+
+  @@index([thread_id], map: "idx_ticket_interactions_thread_id")
+  @@index([ticket_number], map: "idx_ticket_interactions_ticket_number")
+}
+
+model ticket_status {
+  id          Int       @id @default(autoincrement()) @db.SmallInt
+  status      String    @db.VarChar(50)
+  description String?   @db.VarChar(100)
+  created_at  DateTime? @db.Timestamptz(6)
+  updated_at  DateTime? @db.Timestamptz(6)
+  created_by  String?   @db.VarChar(50)
+  updated_by  String?   @db.VarChar(50)
+  is_active   Boolean?
+}
+
+model ticket_threads {
+  id             BigInt    @id @default(autoincrement())
+  ticket_number  String?   @db.VarChar(100)
+  thread_id      String?   @db.VarChar(100)
+  account_name   String?   @db.VarChar(150)
+  subject        String?
+  customer_id    String?   @db.VarChar(100)
+  created_by     String?   @db.VarChar(100)
+  updated_by     String?   @db.VarChar(100)
+  created_at     DateTime? @db.Timestamptz(6)
+  updated_at     DateTime? @db.Timestamptz(6)
+  account_id     String?   @db.VarChar(150)
+  channel_source String    @db.VarChar(50)
+  channel_type   String    @db.VarChar(50)
+
+  @@index([channel_source], map: "idx_threads_channel_source")
+  @@index([thread_id], map: "idx_threads_thread_id")
+  @@index([ticket_number], map: "idx_threads_ticket_number")
+}
+
+model tickets {
+  id                                  String                   @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customer_id                         String                   @db.VarChar(50)
+  ticket_number                       String                   @db.VarChar(50)
+  status                              String                   @db.VarChar(50)
+  category_id                         BigInt?
+  category_sub_id                     BigInt?
+  customer_id_merge                   String?                  @db.VarChar(50)
+  customer_id_origin                  String?                  @db.VarChar(50)
+  complaint_detail                    String?
+  response_detail                     String?
+  sla                                 Int?
+  remark                              String?
+  thread_id                           String?                  @db.VarChar(50)
+  account_id                          String?                  @db.VarChar(150)
+  account_name                        String?                  @db.VarChar(100)
+  last_response_by                    String?                  @db.VarChar(50)
+  last_response_at                    DateTime?                @db.Timestamptz(6)
+  channel_source                      String                   @db.VarChar(50)
+  channel_type                        String?                  @db.VarChar(50)
+  closed_at                           DateTime?                @db.Timestamptz(6)
+  closed_by                           String?                  @db.VarChar(50)
+  created_at                          DateTime                 @db.Timestamptz(6)
+  created_by                          String?                  @db.VarChar(50)
+  assign_to_user                      String?                  @db.VarChar(50)
+  assign_to_team                      Int?
+  priority                            String?                  @db.VarChar(20)
+  reference_id                        String?                  @db.VarChar(50)
+  team_id                             Int?
+  region_id                           Int?
+  coordinates                         Unsupported("geometry")?
+  notif_email                         Boolean?
+  teams_tickets_assign_to_teamToteams teams?                   @relation("tickets_assign_to_teamToteams", fields: [assign_to_team], references: [id])
+  categories                          categories?              @relation(fields: [category_id], references: [id])
+  category_sub                        category_sub?            @relation(fields: [category_sub_id], references: [id])
+  customers                           customers                @relation(fields: [customer_id], references: [customer_id])
+  regions                             regions?                 @relation(fields: [region_id], references: [id])
+  teams_tickets_team_idToteams        teams?                   @relation("tickets_team_idToteams", fields: [team_id], references: [id])
+
+  @@id([id, status, created_at])
+  @@unique([ticket_number, status, created_at])
+  @@index([coordinates], map: "idx_coordinates_gist", type: Gist)
+  @@index([assign_to_team])
+  @@index([category_id])
+  @@index([channel_source])
+  @@index([closed_at])
+  @@index([created_at(sort: Desc)])
+  @@index([customer_id])
+  @@index([region_id])
+  @@index([status])
+  @@index([team_id])
+}
+
+model user_roles {
+  id          Int     @id @default(autoincrement()) @db.SmallInt
+  role_code   String? @db.VarChar(15)
+  role_name   String? @db.VarChar(100)
+  role_scope  String? @db.VarChar(50)
+  description String? @db.VarChar(255)
+}
+
+model users {
+  id                       BigInt    @id @default(autoincrement())
+  fullname                 String?   @db.VarChar(100)
+  username                 String    @db.VarChar(100)
+  email_address            String?   @db.VarChar(255)
+  password                 String    @db.VarChar(255)
+  aux                      String?   @db.VarChar(20)
+  team_id                  Int?
+  role                     String?   @db.VarChar(50)
+  created_at               DateTime? @db.Timestamptz(6)
+  updated_at               DateTime? @db.Timestamptz(6)
+  max_sms                  Int?
+  max_email                Int?
+  max_chat                 Int?
+  max_facebook             Int?
+  max_twitter              Int?
+  max_instagram            Int?
+  max_whatsapp             Int?
+  last_distribute_chat     DateTime? @db.Timestamptz(6)
+  last_distribute_email    DateTime? @db.Timestamptz(6)
+  last_distribute_whatsapp DateTime? @db.Timestamptz(6)
+  max_queue                Int?
+  max_concurrent           Int?
+  max_telegram             Int?
+  last_login               DateTime? @db.Timestamptz(6)
+  login                    Boolean?
+  sms                      Boolean?
+  email                    Boolean?
+  chat                     Boolean?
+  facebook                 Boolean?
+  twitter                  Boolean?
+  instagram                Boolean?
+  whatsapp                 Boolean?
+  telegram                 Boolean?
+  connected                Boolean?
+  login_kick               Boolean?
+  teams                    Int[]
+  tenant_id                Int?
+  call_inbound             Boolean?
+  call_outbound            Boolean?
+  city                     String?   @db.VarChar(50)
+  district                 String?   @db.VarChar(50)
+  max_call_inbound         Int?
+  max_call_outbound        Int?
+  province                 String?   @db.VarChar(50)
+  village                  String?   @db.VarChar(50)
+  team                    teams?    @relation(fields: [team_id], references: [id])
+  tenants                  tenants?  @relation(fields: [tenant_id], references: [id])
+
+  @@index([role], map: "idx_user_role")
+  @@index([team_id], map: "idx_user_team_id")
+  @@index([tenant_id], map: "idx_user_tenant_id")
+  @@index([username], map: "idx_user_username")
+}

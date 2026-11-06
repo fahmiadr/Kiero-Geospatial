@@ -1,0 +1,183 @@
+@import url('https://rsms.me/inter/inter.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f0f2f5;
+  overflow: hidden;
+}
+
+.spinner {
+  width: 56px;
+  height: 56px;
+  border: 6px solid #d1d5db;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pac-container {
+  z-index: 1051 !important;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.gm-ui-hover-effect {
+  display: none !important;
+}
+
+.gm-style .gm-style-iw-c {
+  padding: 0 !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+}
+
+.gm-style .gm-style-iw-d {
+  overflow: hidden !important;
+}
+
+.gm-style .gm-style-iw-t::after {
+  display: none;
+}
+
+
+
+@keyframes drop-in {
+  from {
+    transform: translateY(-50px) scale(0.8);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+.animate-drop-in {
+  animation: drop-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.animate-pulse {
+  animation: pulse 0.4s ease-in-out;
+}
+
+/* New Gradient Wipe Animation */
+.animated-wipe {
+  background-image: linear-gradient(to top, var(--wipe-from-color, #e2e8f0) 50%, var(--wipe-to-color, #0ea5e9) 50%);
+  background-size: 100% 200%;
+  background-position: 100% 100%;
+  /* Start at the bottom (inactive color) */
+  transition: background-position var(--wipe-duration, 0.4s) cubic-bezier(0.77, 0, 0.175, 1);
+  transition-delay: var(--wipe-delay, 0s);
+}
+
+.animated-wipe.active {
+  background-position: 100% 0%;
+  /* Move to the top (active color) */
+}
+
+/* 1. Atur transisi dan posisi awal (INAKTIF) untuk masker */
+/* Secara default, masker ada di posisinya (Y=0), memperlihatkan ikon abu-abu. */
+.icon-gradient-wipe .mask-rectangle {
+  transform: translateY(0%);
+  transition: transform var(--wipe-duration, 0.4s) cubic-bezier(0.77, 0, 0.175, 1);
+  transition-delay: var(--wipe-delay, 0s);
+}
+
+/* 2. Atur posisi akhir (AKTIF) saat kelas .active ditambahkan */
+/* Saat aktif, masker digeser ke atas (-100%), sehingga 'menghapus' ikon abu-abu
+   dan memperlihatkan ikon biru di bawahnya, dari atas ke bawah. */
+.icon-gradient-wipe.active .mask-rectangle {
+  transform: translateY(100%);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  /* Lebar untuk scrollbar vertikal */
+  height: 5px;
+  /* Tinggi untuk scrollbar horizontal */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #e2e8f0;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #4a4a4a;
+  /* Warna abu-abu (Tailwind gray-300) */
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+  /* Warna abu-abu saat hover (Tailwind gray-400) */
+}
+
+/* START: DateRangePicker Custom Scaling */
+.rdrDateRangePickerWrapper .rdrStaticRange {
+  border-bottom: 1px solid #d4d4d4;
+  padding: 0;
+}
+
+.rdrDateRangePickerWrapper .rdrStaticRangeLabel {
+  padding: 8px 15px;
+  font-size: 10.5px;
+}
+
+.rdrDateRangePickerWrapper .rdrMonthAndYear-label {
+  font-size: 12px;
+}
+
+.rdrDateRangePickerWrapper .rdrDay {
+  height: 2.4em;
+  line-height: 2.4em;
+}
+
+.rdrDateRangePickerWrapper .rdrDayNumber {
+  font-size: 10.5px;
+}
+
+.rdrDateRangePickerWrapper .rdrDayNumber span {
+  line-height: 24px;
+}
+
+.rdrDateRangePickerWrapper .rdrMonth {
+  padding: 0 0.8em 0.8em 0.8em;
+  width: 285px;
+}
+
+.rdrDateRangePickerWrapper .rdrDefinedRangesWrapper {
+  width: 170px;
+}
+
+.rdrDateRangePickerWrapper .rdrInputRanges {
+  padding: 5px 0;
+}
+
+.rdrDateRangePickerWrapper .rdrInputRange input {
+  font-size: 10.5px;
+}
+
+/* END: DateRangePicker Custom Scaling */

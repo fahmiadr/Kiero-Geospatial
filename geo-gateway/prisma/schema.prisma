@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model client {
+  id             String          @id @default(cuid())
+  clientName     String          @db.VarChar(50)
+  clientId       String          @unique(map: "clientId")
+  authMethod     String          @default("client_credentials") @db.VarChar(50)
+  publicKey      String
+  privateKey     String?
+  allowedOrigins String
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  refresh_token  refresh_token[]
+}
+
+model refresh_token {
+  id          String   @id @default(cuid())
+  hashedToken String   @unique(map: "hashedToken") @db.VarChar(255)
+  clientId    String
+  createdAt   DateTime @default(now())
+  revoked     Boolean  @default(false)
+  expiresAt   DateTime
+  client      client   @relation(fields: [clientId], references: [id], onDelete: Cascade, map: "fk_refresh_token_clientId")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model spatial_ref_sys {
+  srid      Int     @id
+  auth_name String? @db.VarChar(256)
+  auth_srid Int?
+  srtext    String? @db.VarChar(2048)
+  proj4text String? @db.VarChar(2048)
+}

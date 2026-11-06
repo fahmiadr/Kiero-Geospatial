@@ -1,0 +1,47 @@
+# Dependencies
+node_modules
+npm-debug.log*
+
+# Build artifacts
+dist
+build
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Version control
+.git
+.gitignore
+
+# Docker files (prevent recursive context)
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# IDE & editors
+.vscode
+.idea
+*.swp
+*.swo
+
+# Documentation & non-essential
+*.md
+docs/
+
+# Tooling
+.agent
+.agents
+.husky
+.eslintrc*
+.prettierrc*
+tsconfig.json
+
+# Runtime artifacts (generated at runtime, not needed in build)
+logs
+archives
+*.log
+
+# Testing
+testing
